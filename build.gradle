@@ -1,0 +1,95 @@
+plugins {
+	id 'java-library'
+	id 'maven-publish'
+	id 'signing'
+	id 'io.spring.dependency-management' version '1.1.0'
+
+}
+
+group = 'io.github.lyc8503'
+version = '0.0.3'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-parent
+	implementation 'org.springframework.boot:spring-boot-starter-parent:3.2.3'
+
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+	implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
+
+	// https://mvnrepository.com/artifact/org.projectlombok/lombok
+	compileOnly 'org.projectlombok:lombok:1.18.26'
+	annotationProcessor 'org.projectlombok:lombok:1.18.26'
+
+	// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.0'
+
+	// https://mvnrepository.com/artifact/com.google.guava/guava
+	implementation 'com.google.guava:guava:31.1-jre'
+}
+
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
+
+javadoc {
+	options.addStringOption("charset", "UTF-8")
+	if (JavaVersion.current().isJava9Compatible()) {
+		options.addBooleanOption('html5', true)
+	}
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifactId = 'opening-incantation-spring-boot-starter'
+			from components.java
+			pom {
+				name = 'opening-incantation-spring-boot-starter'
+				description = 'Some magic incantation for Spring Boot'
+				url = 'https://github.com/lyc8503/opening-incantation-spring-boot-starter'
+				licenses {
+					license {
+						name = 'GNU General Public License v3'
+						url = 'https://www.gnu.org/licenses/gpl-3.0.html'
+					}
+				}
+				developers {
+					developer {
+						id = 'lyc8503'
+						name = 'lyc8503'
+						email = 'me@lyc8503.site'
+					}
+				}
+				scm {
+					connection = 'scm:git:git://github.com/lyc8503/opening-incantation-spring-boot-starter'
+					developerConnection = 'scm:git:ssh://github.com/lyc8503/opening-incantation-spring-boot-starter.git'
+					url = '//github.com/lyc8503/opening-incantation-spring-boot-starter'
+				}
+			}
+		}
+	}
+	repositories {
+		maven {
+			name = "OSSRH"
+			if (project.version.toString().endsWith("-SNAPSHOT")) {
+				url = "https://s01.oss.sonatype.org/content/repositories/snapshots"
+			} else {
+				url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+			}
+			credentials {
+				username = findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+				password = findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+			}
+		}
+	}
+}
+
+signing {
+	sign(publishing.publications.mavenJava)
+}
